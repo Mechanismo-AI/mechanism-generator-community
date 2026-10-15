@@ -25,7 +25,7 @@ The project is a kinematic research alpha. It is not engineering certification, 
 4. **No hidden data flows.** No telemetry, no automatic uploads. Sharing results is an explicit, consent-gated act with a local review step, and contributor attribution is preserved.
 5. **Local-first.** The toolkit runs on an ordinary CPU. Using it requires no account, no cloud service, and no fast GPU.
 6. **Reproducible by construction.** Models are hash-pinned, seeds are recorded, and run manifests capture the exact inputs. Two people running the same command should get the same numbers.
-7. **Limitations stated plainly.** Documentation says what the tool does not do. Passing a frozen corpus is regression evidence, not proof of generalization; collision, dynamics, and certification are future work, and the docs never imply otherwise.
+7. **Limitations stated plainly.** Documentation says what the tool does not do. Passing a frozen corpus is regression evidence, not proof of generalization; collision geometry is sampled and never certified, and dynamics and certification are future work; the docs never imply otherwise.
 
 ## How to contribute
 
@@ -70,22 +70,21 @@ Direction of travel, not a contract. Each entry exists because its evidence ship
 - **0.1.0a8 → a10 — geometric search.** Three optional additions that reach for analytic constructions and adaptive sampling when the learned proposals miss, each shipped only after a fresh comparison showed gains with no losses.
 - **motion-v0.1.0-dev0 — six-bar, experimentally.** A separately installable experimental package for twelve-pose motion generation with a sixth bar. Marked dev0, kept out of the main engine.
 - **October 2026 — OMTS v0.2, synchronization (merged to main, releasing with the next version).** The big one: verifying *lines* of mechanisms that share one shaft. Tasks declare their timing contract — anchoring, ordering and window events, applied master-phase offsets — and the verifier composes the achieved results of independently searched mechanisms into a per-combination verdict. Search tools propose offsets; a human declares them; the build record sits beside the verdict and never gates it.
+- **October 2026, collision geometry (merged to main in five gated steps, [PR #18](https://github.com/Mechanismo-AI/mechanism-generator/pull/18) through [PR #22](https://github.com/Mechanismo-AI/mechanism-generator/pull/22)).** Tasks can carry collision bodies (link capsules with thickness, carrier rectangles, pivot discs) and documents declare named static regions. Occupancy is computed by sampling: the `<task>.occupies_region.<region>` windows, with `enters_region` and `exits_region` point events, are derived from the geometry and never authored ([PR #18](https://github.com/Mechanismo-AI/mechanism-generator/pull/18)). Document validation rejects undeclared references and reserved ids fail-closed ([PR #19](https://github.com/Mechanismo-AI/mechanism-generator/pull/19)). Line verification computes each task's collision windows from the shared timeline ([PR #20](https://github.com/Mechanismo-AI/mechanism-generator/pull/20)); every verified line writes a `timeline.json` artifact that `omts timeline` renders offline ([PR #21](https://github.com/Mechanismo-AI/mechanism-generator/pull/21)); and `disjoint_windows` keep-out relations gate line verdicts ([PR #22](https://github.com/Mechanismo-AI/mechanism-generator/pull/22)), closing v0.2 open questions 2 and 3. The other two closed earlier: `phase_relations` deprecation in [PR #15](https://github.com/Mechanismo-AI/mechanism-generator/pull/15), and ordering freedom with a near-miss precheck in line results in [PR #17](https://github.com/Mechanismo-AI/mechanism-generator/pull/17). The first gated case study, a pair of mechanisms sharing one circular keep-out zone, recorded why search itself will need zone awareness ([PR #23](https://github.com/Mechanismo-AI/mechanism-generator/pull/23), [PR #24](https://github.com/Mechanismo-AI/mechanism-generator/pull/24)). Occupancy is sampled, never certified; the spec's `sampled_collision_geometry_v1` method tag says exactly that.
 
 **Where we are**
 
-A working single-mechanism search engine with published, hash-pinned models; a written task specification with strict validation; a consent-gated offline review flow for sharing results; and, as of October 2026, composed-line verification for synchronized mechanisms. A kinematic research alpha — useful, inspectable, and honest about what it is not: no collision checking, no dynamics, no engineering certification.
+A working single-mechanism search engine with published, hash-pinned models; a written task specification with strict validation; a consent-gated offline review flow for sharing results; and, as of October 2026, composed-line verification for synchronized mechanisms. A kinematic research alpha — useful, inspectable, and honest about what it is not: collision checking is sampled occupancy, not a guarantee that every contact is found; no dynamics, no engineering certification.
 
 **Where we're going**
 
 *Near term*
 
-- Close the remaining OMTS v0.2 open questions: deprecating `phase_relations`, path-fragment event references for collision windows, whether sweep and collision windows enter v0.2, and ordering freedom on fixed-timing tasks.
-- A feasibility precheck in line results: report the spread of achieved ordering leads against the required band, so near-miss lines are visible before spending search budget.
+- Zone-aware search: screening shared-zone keep-out during the engine search itself, so candidates that respect a shared zone are found rather than filtered after the fact. The case-study evidence that motivated this shipped with [PR #23](https://github.com/Mechanismo-AI/mechanism-generator/pull/23) and [PR #24](https://github.com/Mechanismo-AI/mechanism-generator/pull/24).
 - More mechanism families beyond the four-bar. Integration happens only behind frozen evaluations with predeclared gates — no family ships because the prototype looked promising.
 
 *Longer term — exploring*
 
-- Collision-body geometry and sweep/collision windows in the composed-timeline verifier.
 - Dwell and handoff events, and ratioed (non-1:1) participation in verified lines.
 - Both crank directions verifiable in composed lines.
 - A public case-study corpus: shared, consented contribution bundles accumulating into a library of verified line designs that new searches can be measured against.
